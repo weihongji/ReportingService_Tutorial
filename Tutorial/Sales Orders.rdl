@@ -861,9 +861,12 @@
           <QueryParameter Name="@EndDate">
             <Value>=Parameters!EndDate.Value</Value>
           </QueryParameter>
+          <QueryParameter Name="@BusinessPersonID">
+            <Value>=Parameters!BusinessPersonID.Value</Value>
+          </QueryParameter>
         </QueryParameters>
         <CommandText>SELECT 
-   soh.OrderDate AS [Date], 
+   soh.OrderDate AS [Date], DATENAME(weekday, soh.OrderDate) as Weekday,
    soh.SalesOrderNumber AS [Order], 
    pps.Name AS Subcat, pp.Name as Product,  
    SUM(sd.OrderQty) AS Qty,
@@ -881,8 +884,10 @@ FROM Sales.SalesPerson sp
       ON ppc.ProductCategoryID = pps.ProductCategoryID
 GROUP BY ppc.Name, soh.OrderDate, soh.SalesOrderNumber, 
    pps.Name, pp.Name,    soh.SalesPersonID
-HAVING (ppc.Name = 'Clothing' 
-   AND (soh.OrderDate BETWEEN (@StartDate) AND (@EndDate)))</CommandText>
+HAVING 
+ppc.Name = 'Clothing' 
+AND (soh.OrderDate BETWEEN (@StartDate) AND (@EndDate))
+AND  soh.SalesPersonID = (@BusinessPersonID)</CommandText>
       </Query>
       <Fields>
         <Field Name="Date">
@@ -891,6 +896,10 @@ HAVING (ppc.Name = 'Clothing'
         </Field>
         <Field Name="Order">
           <DataField>Order</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Weekday">
+          <DataField>Weekday</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Subcat">
@@ -908,6 +917,33 @@ HAVING (ppc.Name = 'Clothing'
         <Field Name="LineTotal">
           <DataField>LineTotal</DataField>
           <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="BusinessPersons">
+      <Query>
+        <DataSourceName>AdventureWorks2008R2_Ref</DataSourceName>
+        <CommandText>SELECT SP.BusinessEntityID, C.FirstName, C.LastName
+FROM   Sales.SalesPerson AS SP INNER JOIN
+     HumanResources.Employee AS E ON E.BusinessEntityID = SP.BusinessEntityID INNER JOIN
+     Person.Person AS C ON C.BusinessEntityID = E.BusinessEntityID
+ORDER BY SP.BusinessEntityID</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="BusinessEntityID">
+          <DataField>BusinessEntityID</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="FirstName">
+          <DataField>FirstName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="LastName">
+          <DataField>LastName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Name">
+          <Value>=Fields!LastName.Value &amp; ", " &amp; Fields!FirstName.Value</Value>
         </Field>
       </Fields>
     </DataSet>
@@ -930,6 +966,23 @@ HAVING (ppc.Name = 'Clothing'
         </Values>
       </DefaultValue>
       <Prompt>End Date</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BusinessPersonID">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>BusinessPersons</DataSetName>
+          <ValueField>BusinessEntityID</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>Select business person</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>BusinessPersons</DataSetName>
+          <ValueField>BusinessEntityID</ValueField>
+          <LabelField>Name</LabelField>
+        </DataSetReference>
+      </ValidValues>
     </ReportParameter>
   </ReportParameters>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
