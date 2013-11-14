@@ -887,7 +887,7 @@ GROUP BY ppc.Name, soh.OrderDate, soh.SalesOrderNumber,
 HAVING 
 ppc.Name = 'Clothing' 
 AND (soh.OrderDate BETWEEN (@StartDate) AND (@EndDate))
-AND  soh.SalesPersonID = (@BusinessPersonID)</CommandText>
+AND  soh.SalesPersonID IN (@BusinessPersonID)</CommandText>
       </Query>
       <Fields>
         <Field Name="Date">
@@ -983,6 +983,7 @@ ORDER BY SP.BusinessEntityID</CommandText>
           <LabelField>Name</LabelField>
         </DataSetReference>
       </ValidValues>
+      <MultiValue>true</MultiValue>
     </ReportParameter>
   </ReportParameters>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
