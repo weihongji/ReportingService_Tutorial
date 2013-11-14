@@ -844,11 +844,8 @@
   </Page>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
-    <DataSource Name="AdventureWorks2008R2">
-      <ConnectionProperties>
-        <DataProvider>SQL</DataProvider>
-        <ConnectString>Data source=.\SQL2012; initial catalog=AdventureWorks2008R2</ConnectString>
-      </ConnectionProperties>
+    <DataSource Name="AdventureWorks2008R2_Ref">
+      <DataSourceReference>AdventureWorks2008R2</DataSourceReference>
       <rd:SecurityType>DataBase</rd:SecurityType>
       <rd:DataSourceID>f457d366-6710-4ccc-ae70-8ca5a53edc83</rd:DataSourceID>
     </DataSource>
@@ -856,8 +853,16 @@
   <DataSets>
     <DataSet Name="AdventureWorksDataset">
       <Query>
-        <DataSourceName>AdventureWorks2008R2</DataSourceName>
-        <CommandText>SELECT TOP 20
+        <DataSourceName>AdventureWorks2008R2_Ref</DataSourceName>
+        <QueryParameters>
+          <QueryParameter Name="@StartDate">
+            <Value>=Parameters!StartDate.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@EndDate">
+            <Value>=Parameters!EndDate.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <CommandText>SELECT 
    soh.OrderDate AS [Date], 
    soh.SalesOrderNumber AS [Order], 
    pps.Name AS Subcat, pp.Name as Product,  
@@ -874,10 +879,10 @@ FROM Sales.SalesPerson sp
       ON pp.ProductSubcategoryID = pps.ProductSubcategoryID
    INNER JOIN Production.ProductCategory AS ppc 
       ON ppc.ProductCategoryID = pps.ProductCategoryID
-WHERE soh.OrderDate &gt;= '20061001'
-GROUP BY ppc.Name, soh.OrderDate, soh.SalesOrderNumber, pps.Name, pp.Name, 
-   soh.SalesPersonID
-HAVING ppc.Name = 'Clothing'</CommandText>
+GROUP BY ppc.Name, soh.OrderDate, soh.SalesOrderNumber, 
+   pps.Name, pp.Name,    soh.SalesPersonID
+HAVING (ppc.Name = 'Clothing' 
+   AND (soh.OrderDate BETWEEN (@StartDate) AND (@EndDate)))</CommandText>
       </Query>
       <Fields>
         <Field Name="Date">
@@ -907,6 +912,26 @@ HAVING ppc.Name = 'Clothing'</CommandText>
       </Fields>
     </DataSet>
   </DataSets>
+  <ReportParameters>
+    <ReportParameter Name="StartDate">
+      <DataType>DateTime</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>1/31/2005 12:00:00 AM</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Start Date</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="EndDate">
+      <DataType>DateTime</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>8/31/2005 12:00:00 AM</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>End Date</Prompt>
+    </ReportParameter>
+  </ReportParameters>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
   <rd:ReportID>2f772223-b679-4173-b802-ff8fa82b48e3</rd:ReportID>
 </Report>

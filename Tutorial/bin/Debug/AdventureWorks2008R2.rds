@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="AdventureWorks2008R2">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Data source=.\SQL2012; initial catalog=AdventureWorks2008R2</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>4af12a88-6735-47d2-b6ad-18bbd788ce08</DataSourceID>
+</RptDataSource>
